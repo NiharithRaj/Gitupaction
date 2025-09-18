@@ -14,7 +14,7 @@ jobs:
         run: /usr/bin/xcodebuild -version
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install the Apple certificate and provisioning profile
         env:
@@ -67,7 +67,7 @@ jobs:
       - name: Rename ipa
         run: mv $RUNNER_TEMP/build/*.ipa $RUNNER_TEMP/build/action.ipa
 
-      - name: Upload application
+      - name: Upload application artifact
         uses: actions/upload-artifact@v4
         with:
           name: app
@@ -87,20 +87,18 @@ jobs:
       - name: Install fastlane
         run: gem install fastlane
 
-      - name: Decode App Store Connect API key
+      - name: Create API key JSON
         run: |
-          echo "${{ secrets.APP_STORE_CONNECT_KEY }}" | base64 --decode > $RUNNER_TEMP/AuthKey.p8
+          echo '{
+            "key_id": "${{ secrets.APP_STORE_CONNECT_KEY_ID }}",
+            "issuer_id": "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}",
+            "key": "${{ secrets.APP_STORE_CONNECT_KEY }}",
+            "in_house": false
+          }' > $RUNNER_TEMP/api_key.json
 
       - name: Upload to TestFlight
-        env:
-          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
         run: |
           fastlane pilot upload \
-            --api_key_path $RUNNER_TEMP/AuthKey.p8 \
-            --api_key_id $APP_STORE_CONNECT_KEY_ID \
-            --api_key_issuer_id $APP_STORE_CONNECT_ISSUER_ID \
-            --team_id $APP_STORE_CONNECT_TEAM_ID \
+            --api_key_path $RUNNER_TEMP/api_key.json \
             --ipa ${{ runner.temp }}/build/action.ipa \
             --skip_waiting_for_build_processing true
