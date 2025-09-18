@@ -68,7 +68,7 @@ jobs:
         run: mv $RUNNER_TEMP/build/*.ipa $RUNNER_TEMP/build/action.ipa
 
       - name: Upload application
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: app
           path: ${{ runner.temp }}/build/action.ipa
@@ -79,7 +79,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Download app artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v4
         with:
           name: app
           path: ${{ runner.temp }}/build
