@@ -6,8 +6,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-name: "Build iOS app"
-
 jobs:
   build_with_signing:
     runs-on: macos-latest
