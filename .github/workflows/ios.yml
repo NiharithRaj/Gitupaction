@@ -48,8 +48,10 @@ jobs:
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: build archive
+        working-directory: Action
         run: |
-          xcodebuild -scheme "Action" \
+          xcodebuild \
+          -scheme "Action" \
           -archivePath $RUNNER_TEMP/action.xcarchive \
           -sdk iphoneos \
           -configuration Debug \
